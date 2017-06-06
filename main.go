@@ -49,7 +49,7 @@ func GenSwagger() *spec.Swagger {
     swagger := &spec.Swagger{
         SwaggerProps: spec.SwaggerProps{
             SecurityDefinitions: map[string] *spec.SecurityScheme{
-                "ApiKey": spec.APIKeyAuth("api_key", "header"),
+                "ApiKey": spec.APIKeyAuth("Authorization", "header"),
             },
             Security: []map[string][]string{
                 {"ApiKey": {}},
