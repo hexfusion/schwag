@@ -32,6 +32,8 @@ func main() {
     primary.Security = swagStub.Security
     primary.SecurityDefinitions = swagStub.SecurityDefinitions
 
+    FixEmptyResponseDescriptions(primary)
+
     b, err := json.MarshalIndent(primary, "", "  ")
     check(err)
     out := *outPtr;
@@ -55,4 +57,52 @@ func GenSwagger() *spec.Swagger {
         },
     }
     return swagger
+}
+
+// thanks to github.com/msample/swagger-mixin for the empty desc solution
+func FixEmptyResponseDescriptions(s *spec.Swagger) {
+    for _, v := range s.Paths.Paths {
+        if v.Put != nil {
+            FixEmptyDescs(v.Put.Responses)
+        }
+        if v.Post != nil {
+            FixEmptyDescs(v.Post.Responses)
+        }
+        if v.Delete != nil {
+            FixEmptyDescs(v.Delete.Responses)
+        }
+        if v.Options != nil {
+            FixEmptyDescs(v.Options.Responses)
+        }
+        if v.Head != nil {
+            FixEmptyDescs(v.Head.Responses)
+        }
+        if v.Patch != nil {
+            FixEmptyDescs(v.Patch.Responses)
+        }
+    }
+    for k, v := range s.Responses {
+        FixEmptyDesc(&v)
+        s.Responses[k] = v
+    }
+}
+
+// FixEmptyDescs adds "(empty)" as the description for any Response in
+// the given Responses object that doesn't already have one.
+func FixEmptyDescs(rs *spec.Responses) {
+    FixEmptyDesc(rs.Default)
+    for k, v := range rs.StatusCodeResponses {
+        FixEmptyDesc(&v)
+        rs.StatusCodeResponses[k] = v
+    }
+}
+
+// FixEmptyDesc adds "(empty)" as the description to the given
+// Response object if it doesn't already have one and isn't a
+// ref. No-op on nil input.
+func FixEmptyDesc(rs *spec.Response) {
+    if rs == nil || rs.Description != "" || rs.Ref.Ref.GetURL() != nil {
+        return
+    }
+    rs.Description = "(empty)"
 }
