@@ -1,6 +1,7 @@
 # schwag
-Schwag consumes your JSON swagger spec and applies Security and SecurityDefinitions
+Schwag consumes your JSON swagger spec and applies Security and SecurityDefinitions using go-openapi tooling.  Right now it only accepts JSON input.
 
 ### flags
---input
---output # default is to write to input
+--input=./relative/path/swagger.json
+
+--output # defaults to input path
